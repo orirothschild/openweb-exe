@@ -11,12 +11,12 @@ jobs:
       - gcp-gcr/build-image:
           image: openweb-app
           no_output_timeout: 20m
-          registry-url: us-central1-docker.pkg.dev/optimal-jigsaw-282408/openweb-exe
+          registry-url: us-central1-docker.pkg.dev
       - gcp-gcr/gcr-auth
       - gcp-gcr/push-image:
           digest-path: /tmp/digest.txt
           image: openweb-app
-          registry-url: us-central1-docker.pkg.dev/optimal-jigsaw-282408/openweb-exe
+          registry-url: us-central1-docker.pkg.dev
       - run:
           command: |
             echo "Digest is: $(</tmp/digest.txt)"
