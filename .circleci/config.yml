@@ -13,7 +13,7 @@ jobs:
       - docker/push:
           digest-path: /tmp/digest.txt
           image: orirothschild/openweb-app
-          tag: openweb-app
+          tag: latest
       - run:
           command: |
             echo "Digest is: $(</tmp/digest.txt)"
