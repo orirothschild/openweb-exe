@@ -1,0 +1,34 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: openweb-app
+  labels:
+    app: openweb-app
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: openweb-app
+  template:
+    metadata:
+      labels:
+        app: openweb-app
+    spec:
+      containers:
+      - name: openweb-app
+        image: orirothschild/openweb-app:latest
+        ports:
+        - containerPort: 80
+        readinessProbe:
+          httpGet:
+            path: /
+            port: 80
+          initialDelaySeconds: 5
+          periodSeconds: 10
+        livenessProbe:
+          httpGet:
+            path: /
+            port: 80
+          initialDelaySeconds: 15
+          periodSeconds: 20
+      terminationGracePeriodSeconds: 30
