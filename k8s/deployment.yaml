@@ -18,17 +18,38 @@ spec:
       - name: openweb-app
         image: orirothschild/openweb-app:latest
         ports:
-        - containerPort: 80
+        - containerPort: 8080
+        env:
+        - name: PORT
+          valueFrom:
+            configMapKeyRef:
+              name: app-config
+              key: PORT
+        - name: DB_HOST
+          valueFrom:
+            configMapKeyRef:
+              name: app-config
+              key: DB_HOST
+        - name: DB_USER
+          valueFrom:
+            configMapKeyRef:
+              name: app-config
+              key: DB_USER
+        - name: DB_PASS
+          valueFrom:
+            configMapKeyRef:
+              name: app-config
+              key: DB_PASS
         readinessProbe:
           httpGet:
             path: /
-            port: 80
+            port: 8080
           initialDelaySeconds: 5
           periodSeconds: 10
         livenessProbe:
           httpGet:
             path: /
-            port: 80
+            port: 8080
           initialDelaySeconds: 15
           periodSeconds: 20
       terminationGracePeriodSeconds: 30
