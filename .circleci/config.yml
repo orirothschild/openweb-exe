@@ -10,6 +10,7 @@ jobs:
       - docker/check
       - docker/build:
           image: orirothschild/openweb-app
+          tag: latest
       - docker/push:
           digest-path: /tmp/digest.txt
           image: orirothschild/openweb-app
