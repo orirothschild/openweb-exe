@@ -8,6 +8,10 @@ jobs:
     steps:
       - checkout
       - gcp-gcr/gcr-auth
+      - run:
+          name: list repos
+          command: |
+            gcloud artifacts repositories list --location=us-central1
       - gcp-gcr/build-image:
           image: openweb-app
           no_output_timeout: 20m
