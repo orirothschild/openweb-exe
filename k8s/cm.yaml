@@ -3,7 +3,8 @@ kind: ConfigMap
 metadata:
   name: app-config
 data:
-  PORT: "4040"
-  DB_HOST: "127.0.0.1"
-  DB_USER: "root"
-  DB_PASS: ""
+  .env: |
+    PORT=4040
+    DB_HOST=mysql
+    DB_USER=root
+    DB_PASS=ori-root-pass
