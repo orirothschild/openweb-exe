@@ -12,6 +12,9 @@ jobs:
           name: list repos
           command: |
             gcloud artifacts repositories list --location=us-central1
+            gcloud config set project optimal-jigsaw-282408
+            gcloud auth configure-docker us-central1-docker.pkg.dev
+
       - gcp-gcr/build-image:
           image: openweb-exe
           no_output_timeout: 20m
