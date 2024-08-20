@@ -1,28 +1,18 @@
 version: 2.1
 orbs:
-  gcp-gcr: circleci/gcp-gcr@0.16.3
-
+  docker: circleci/docker@2.6.0
 jobs:
   build-and-push:
-    executor: gcp-gcr/default
+    executor: docker/docker
     steps:
+      - setup_remote_docker
       - checkout
-      - gcp-gcr/gcr-auth
-      - run:
-          name: list repos
-          command: |
-            gcloud artifacts repositories list --location=us-central1
-            gcloud config set project optimal-jigsaw-282408
-            gcloud auth configure-docker us-central1-docker.pkg.dev
-
-      - gcp-gcr/build-image:
-          image: openweb-exe
-          no_output_timeout: 20m
-          registry-url: us-central1-docker.pkg.dev
-      - gcp-gcr/push-image:
+      - docker/check
+      - docker/build:
+          image: orirothschild/openweb-app
+      - docker/push:
           digest-path: /tmp/digest.txt
-          image: openweb-exe
-          registry-url: us-central1-docker.pkg.dev
+          image: orirothschild/openweb-app
       - run:
           command: |
             echo "Digest is: $(</tmp/digest.txt)"
