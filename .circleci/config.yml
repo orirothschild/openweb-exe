@@ -9,11 +9,11 @@ jobs:
       - checkout
       - docker/check
       - docker/build:
-          image: orirothschild/openweb-app
+          image: $DOCKER_IMAGE_NAME
           tag: latest
       - docker/push:
           digest-path: /tmp/digest.txt
-          image: orirothschild/openweb-app
+          image: $DOCKER_IMAGE_NAME
           tag: latest
       - run:
           command: |
