@@ -1,5 +1,6 @@
 version: 2.1
 orbs:
+  # orb provided by circleci https://circleci.com/developer/orbs/orb/circleci/docker
   docker: circleci/docker@2.6.0
 jobs:
   build-and-push:
