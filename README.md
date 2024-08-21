@@ -1,6 +1,6 @@
 # OpenWeb Home Task
 
-This project involves deploying a ToDo list application provided by the OpenWeb team. The goal is to containerize the application, set up a CI/CD pipeline, and deploy it on Kubernetes with a durable MySQL database.
+This project involves deploying a ToDo list application provided by the OpenWeb team. The solution includes containerizing the application, setting up a CI/CD pipeline, and deploying it on Kubernetes with a durable MySQL database.
 
 ## Project Overview
 
@@ -10,44 +10,63 @@ The project consists of the following components:
 2. **CircleCI Configuration**: Builds the Docker image and pushes it to Docker Hub.
 3. **Kubernetes Manifests**: Deploys the application and MySQL database, ensuring high availability and durability.
 
-## CircleCI Configuration
+## CI/CD Flow
 
-The CircleCI pipeline builds the Docker image using the provided `Dockerfile` and pushes it to Docker Hub. The key environment variables used in CircleCI are:
+### CircleCI Pipeline
 
-- `DOCKER_IMAGE_NAME`: The name of the Docker image.
-- `DOCKER_LOGIN`: Docker Hub login username.
-- `DOCKER_PASSWORD`: Docker Hub private token with write permissions.
+The CircleCI pipeline automates the process of building, testing, and deploying the application. Here’s a detailed breakdown of the pipeline:
+
+1. **Pipeline Configuration**: Defined in `.circleci/config.yml`.
+
+2. **Jobs**:
+   - **build-and-push**: This job performs the following steps:
+     - **Setup Remote Docker**: Prepares the Docker environment for building and pushing images.
+     - **Checkout**: Retrieves the code from the repository.
+     - **Docker Build**: Builds the Docker image using the `Dockerfile` in the repository.
+     - **Docker Push**: Pushes the built Docker image to Docker Hub.
+     - **Run Digest Command**: Outputs the digest of the pushed Docker image for verification.
+
+3. **Workflows**:
+   - **commit**: This workflow triggers the `build-and-push` job whenever code is committed to the repository.
+
+### Docker Hub Integration
 
 The Docker Hub Orb (`circleci/docker@2.6.0`) is used to streamline Docker-related tasks:
-- **build**: Builds the Docker image.
-- **push**: Pushes the image to Docker Hub.
 
-## Kubernetes Deployment
+- **docker/build**: Builds the Docker image with the specified name and tag.
+- **docker/push**: Pushes the Docker image to Docker Hub, using the credentials provided by the environment variables.
 
-### Application Deployment
+**Environment Variables Required in CircleCI**:
+- `DOCKER_IMAGE_NAME`: The name of the Docker image to be built and pushed.
+- `DOCKER_LOGIN`: Docker Hub login username.
+- `DOCKER_PASSWORD`: Docker Hub private token with write permissions to the repository `orirothschild/openweb-app`.
 
-- **Deployment**: Manages the `openweb-app` application, running a minimum of 3 replicas to ensure high availability. The deployment is configured to be resilient to voluntary disruptions. It mounts a ConfigMap containing environment variables and listens on port 8080.
-- **Service**: Exposes the `openweb-app` application through a LoadBalancer service, allowing external access on port 80 and routing traffic to port 4040 in the container.
-- **HorizontalPodAutoscaler (HPA)**: Automatically scales the number of replicas for the `openweb-app` deployment based on CPU utilization.
-- **PodDisruptionBudget (PDB)**: Ensures that a minimum number of pods are available during voluntary disruptions, contributing to the application's high availability.
+### Kubernetes Deployment
 
-### MySQL Deployment
+The application and MySQL database are deployed using Kubernetes manifests:
 
-- **Secret**: Stores the root password for the MySQL database.
-- **Service**: Exposes the MySQL database internally within the cluster on port 3306.
-- **StatefulSet**: Manages the MySQL database instance with persistent storage for durability and a predefined root password. Ensures the MySQL service is stable and reliable.
-- **PersistentVolumeClaim**: Requests persistent storage for the MySQL database.
-- **StorageClass**: Defines the storage class for provisioning the persistent volume.
+1. **Application Deployment**:
+   - **Deployment**: Manages the `openweb-app` application with high availability and resilience to voluntary disruptions. The application is exposed via a LoadBalancer service.
+   - **HorizontalPodAutoscaler (HPA)**: Scales the number of replicas based on CPU utilization.
+   - **PodDisruptionBudget (PDB)**: Ensures a minimum number of pods are available during voluntary disruptions.
+
+2. **MySQL Deployment**:
+   - **Secret**: Stores the root password for MySQL.
+   - **Service**: Exposes the MySQL database internally on port 3306.
+   - **StatefulSet**: Manages the MySQL instance with persistent storage.
+   - **PersistentVolumeClaim**: Requests storage for MySQL data.
+   - **StorageClass**: Defines the storage class for provisioning volumes.
 
 ## Application Setup
 
-1. **Environment Variables**: The `.env` file is used to configure the application. It specifies the port (`4040`), MySQL host (`mysql`), user (`root`), and password (`ori-root-pass`).
-2. **Database Setup**: On startup, the application connects to the MySQL database, creates a new database (`gotodo`), and sets up the required tables.
+1. **Environment Variables**: The `.env` file configures the application with the port (`4040`), MySQL host (`mysql`), user (`root`), and password (`ori-root-pass`).
+2. **Database Setup**: The application initializes the MySQL database by creating a new database (`gotodo`) and setting up the necessary tables upon startup.
 
 ## Summary
 
-This project ensures that:
+This solution ensures that:
 - The application is highly available, with automatic scaling and resilience to voluntary disruptions.
 - The MySQL database is durable, with persistent storage and reliable access within the Kubernetes cluster.
+- The CI/CD pipeline automates the build, test, and deployment processes, integrating seamlessly with Docker Hub and Kubernetes.
 
 All Kubernetes manifests are provided in the `k8s` folder and are ready to be applied using `kubectl`.
