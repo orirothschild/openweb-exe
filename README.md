@@ -62,6 +62,22 @@ The application and MySQL database are deployed using Kubernetes manifests:
 1. **Environment Variables**: The `.env` file configures the application with the port (`4040`), MySQL host (`mysql`), user (`root`), and password (`ori-root-pass`).
 2. **Database Setup**: The application initializes the MySQL database by creating a new database (`gotodo`) and setting up the necessary tables upon startup.
 
+
+
+### `update_host` Script
+To update the `/etc/hosts` file with the LoadBalancer IP address, use the provided `update_host` script.
+The `update_host` script updates your local `/etc/hosts` file to map `tools.devops-openweb.com` to the LoadBalancer IP address. 
+
+**Usage**:
+1. Make the script executable:
+   ```bash
+   chmod +x update_host
+2. Run the script:
+    ./update_host <LOAD_BALANCER_IP>
+Replace <LOAD_BALANCER_IP> with the IP address provided by your LoadBalancer service.
+
+
+
 ## Summary
 
 This solution ensures that:
