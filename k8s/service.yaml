@@ -3,10 +3,9 @@ kind: Service
 metadata:
   name: openweb-app
 spec:
+  type: LoadBalancer
   selector:
     app: openweb-app
-  type: LoadBalancer
   ports:
-    - protocol: TCP
-      port: 80
-      targetPort: 80
+    - port: 80
+      targetPort: 4040
