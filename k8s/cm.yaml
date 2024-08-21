@@ -1,0 +1,10 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: app-config
+data:
+  .env: |
+    PORT=4040
+    DB_HOST=mysql
+    DB_USER=root
+    DB_PASS=ori-root-pass

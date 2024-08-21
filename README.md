@@ -1,53 +1,88 @@
-# Go Todo
+# OpenWeb Home Task
 
-![hero](https://res.cloudinary.com/ichtrojan/image/upload/v1574958373/Screenshot_2019-11-28_at_17.22.25_gyegdr.png)
+This project involves deploying a ToDo list application provided by the OpenWeb team. The solution includes containerizing the application, setting up a CI/CD pipeline, and deploying it on Kubernetes with a durable MySQL database.
 
-## Introduction
+## Project Overview
 
-A simple todolist application written in Go 
+The project consists of the following components:
 
-## Requirements
-* MySQL installed
-* Go installed
+1. **Dockerfile**: Containerizes the application.
+2. **CircleCI Configuration**: Builds the Docker image and pushes it to Docker Hub.
+3. **Kubernetes Manifests**: Deploys the application and MySQL database, ensuring high availability and durability.
 
-## Installation
+## CI/CD Flow
 
-* Clone this repo 
+### CircleCI Pipeline
 
-```bash
-git clone https://github.com/ichtrojan/go-todo.git
-```
+The CircleCI pipeline automates the process of building, testing, and deploying the application. Here’s a detailed breakdown of the pipeline:
 
-* Change Directory
+1. **Pipeline Configuration**: Defined in `.circleci/config.yml`.
 
-```bash
-cd go-todo
-```
+2. **Jobs**:
+   - **build-and-push**: This job performs the following steps:
+     - **Setup Remote Docker**: Prepares the Docker environment for building and pushing images.
+     - **Checkout**: Retrieves the code from the repository.
+     - **Docker Build**: Builds the Docker image using the `Dockerfile` in the repository.
+     - **Docker Push**: Pushes the built Docker image to Docker Hub.
+     - **Run Digest Command**: Outputs the digest of the pushed Docker image for verification.
 
-* Initiate `.env` file
+3. **Workflows**:
+   - **commit**: This workflow triggers the `build-and-push` job whenever code is committed to the repository.
 
-```bash
-cp .env.example .env
-```
+### Docker Hub Integration
 
-* Modify `.env` file with your correct database credentials and desired Port
+The Docker Hub Orb (`circleci/docker@2.6.0`) is used to streamline Docker-related tasks:
 
-## Usage
+- **docker/build**: Builds the Docker image with the specified name and tag.
+- **docker/push**: Pushes the Docker image to Docker Hub, using the credentials provided by the environment variables.
 
-To run this application, execute:
+**Environment Variables Required in CircleCI**:
+- `DOCKER_IMAGE_NAME`: The name of the Docker image to be built and pushed.
+- `DOCKER_LOGIN`: Docker Hub login username.
+- `DOCKER_PASSWORD`: Docker Hub private token with write permissions to the repository `orirothschild/openweb-app`.
 
-```bash
-go run main.go
-```
+### Kubernetes Deployment
 
-You should be able to access this application at `http://127.0.0.1:4040`
+The application and MySQL database are deployed using Kubernetes manifests:
 
->**NOTE**<br>
->If you modified the port in the `.env` file, you should access the application for the port you set
+1. **Application Deployment**:
+   - **Deployment**: Manages the `openweb-app` application with high availability and resilience to voluntary disruptions. The application is exposed via a LoadBalancer service.
+   - **HorizontalPodAutoscaler (HPA)**: Scales the number of replicas based on CPU utilization.
+   - **PodDisruptionBudget (PDB)**: Ensures a minimum number of pods are available during voluntary disruptions.
 
-## Credits
+2. **MySQL Deployment**:
+   - **Secret**: Stores the root password for MySQL.
+   - **Service**: Exposes the MySQL database internally on port 3306.
+   - **StatefulSet**: Manages the MySQL instance with persistent storage.
+   - **PersistentVolumeClaim**: Requests storage for MySQL data.
+   - **StorageClass**: Defines the storage class for provisioning volumes.
 
-Mirrored from https://github.com/ichtrojan/go-todo
-# openweb-ex
-# openweb-exe
-# openweb-exe
+## Application Setup
+
+1. **Environment Variables**: The `.env` file configures the application with the port (`4040`), MySQL host (`mysql`), user (`root`), and password (`ori-root-pass`).
+2. **Database Setup**: The application initializes the MySQL database by creating a new database (`gotodo`) and setting up the necessary tables upon startup.
+
+
+
+### `update_host` Script
+To update the `/etc/hosts` file with the LoadBalancer IP address, use the provided `update_host` script.
+The `update_host` script updates your local `/etc/hosts` file to map `tools.devops-openweb.com` to the LoadBalancer IP address. 
+
+**Usage**:
+1. Make the script executable:
+   ```bash
+   chmod +x update_host
+2. Run the script:
+    ./update_host <LOAD_BALANCER_IP>
+Replace <LOAD_BALANCER_IP> with the IP address provided by your LoadBalancer service.
+
+
+
+## Summary
+
+This solution ensures that:
+- The application is highly available, with automatic scaling and resilience to voluntary disruptions.
+- The MySQL database is durable, with persistent storage and reliable access within the Kubernetes cluster.
+- The CI/CD pipeline automates the build, test, and deployment processes, integrating seamlessly with Docker Hub and Kubernetes.
+
+All Kubernetes manifests are provided in the `k8s` folder and are ready to be applied using `kubectl`.

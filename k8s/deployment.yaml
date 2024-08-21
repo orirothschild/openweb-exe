@@ -1,0 +1,27 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: openweb-app
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: openweb-app
+  template:
+    metadata:
+      labels:
+        app: openweb-app
+    spec:
+      containers:
+      - name: openweb-app
+        image: orirothschild/openweb-app:latest
+        ports:
+        - containerPort: 8080
+        volumeMounts:
+        - name: config-volume
+          mountPath: /app/.env
+          subPath: .env
+      volumes:
+      - name: config-volume
+        configMap:
+          name: app-config

@@ -28,12 +28,6 @@ COPY --from=builder /app/main .
 # Copy static files (e.g., views directory) from the builder stage
 COPY --from=builder /app/views /app/views
 
-# Set environment variables
-ENV DB_USER=myuser
-ENV DB_PASSWORD=mypassword
-ENV DB_HOST=myhost
-ENV DB_NAME=mydatabase
-
 # Expose the port the application will run on
 EXPOSE 8080
 

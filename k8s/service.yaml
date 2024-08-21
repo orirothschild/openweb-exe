@@ -1,0 +1,11 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: openweb-app
+spec:
+  type: LoadBalancer
+  selector:
+    app: openweb-app
+  ports:
+    - port: 80
+      targetPort: 4040
